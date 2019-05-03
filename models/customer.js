@@ -30,6 +30,40 @@ class Customer {
     return results.rows.map(c => new Customer(c));
   }
 
+// Get users with search input 
+  static async search(name) {
+    const results = await db.query(
+      `SELECT id, 
+         first_name AS "firstName",  
+         last_name AS "lastName", 
+         phone, 
+         notes
+       FROM customers
+       WHERE first_name = $1 OR last_name = $1`, [name]
+    );
+    return results.rows.map(c => new Customer(c));
+  }
+
+  static async mostReservationsMade(){
+    const results = await db.query(
+      `Select c.id, 
+        c.first_name AS "firstName", 
+        c.last_name AS "lastName",
+        c.phone,
+        c.notes, 
+        count(*) as count
+        from customers c 
+        join reservations r 
+        on r.customer_id = c.id 
+        group by c.id, c.first_name, c.last_name, c.phone, c.notes 
+        order by count(*) DESC limit 10`
+       
+    );
+    console.log(results)
+    return results.rows.map(c => new Customer(c));
+   }
+
+
   /** get a customer by ID. */
 
   static async get(id) {

@@ -11,8 +11,14 @@ const router = new express.Router();
 
 router.get("/", async function(req, res, next) {
   try {
+    let searchResult = req.query.search
+    if(searchResult){
+    const customers = await Customer.search(searchResult); 
+    return res.render("customer_list.html", { customers });
+    }else{
     const customers = await Customer.all();
     return res.render("customer_list.html", { customers });
+    }
   } catch (err) {
     return next(err);
   }
@@ -23,6 +29,17 @@ router.get("/", async function(req, res, next) {
 router.get("/add/", async function(req, res, next) {
   try {
     return res.render("customer_new_form.html");
+  } catch (err) {
+    return next(err);
+  }
+});
+
+
+router.get("/top-customers", async function(req, res, next) {
+  try {
+    let results = await Customer.mostReservationsMade();
+    console.log(results)
+    return res.render("populate_top_customers.html", { results });
   } catch (err) {
     return next(err);
   }
